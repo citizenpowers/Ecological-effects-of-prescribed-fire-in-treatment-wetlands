@@ -3,16 +3,9 @@
 
 
 library(dplyr)
-library(lubridate)
-library(rvest)
-library(stringr)
-library(readr)
-library(purrr)
 library(odbc)
 library(DBI)
 library(glue)
-
-
 
 
 Inflow_keys <- data.frame(`Flow-way Location`="Inflow",
@@ -55,7 +48,7 @@ db_flow_keys <- as.character(Flow_keys$DBkey)                                   
 
 flow_query <- glue_sql("SELECT V_KEYWORD_TAB_DAILY.*
 FROM V_KEYWORD_TAB_DAILY
-WHERE V_KEYWORD_TAB_DAILY.DBKEY IN ({db_keys*})
+WHERE V_KEYWORD_TAB_DAILY.DBKEY IN ({db_flow_keys*})
 AND V_KEYWORD_TAB_DAILY.DAILY_DATE <= CURRENT_DATE
 AND V_KEYWORD_TAB_DAILY.DAILY_DATE >= TO_DATE ('11/01/2024', 'MM/DD/YYYY')
 AND V_KEYWORD_TAB_DAILY.STATISTIC_TYPE IN ('SUM', 'MEAN')",.con=con)             
