@@ -7,13 +7,67 @@ library(ggplot2)
 library(lubridate)
 library(readxl)
 
+
+library(odbc)
+library(DBI)
+library(glue)
+
+
+
+# Open connection and download data from ERDP (DOES not work)---------------------------------------
+
+con <- dbConnect(odbc::odbc(), UID = "???", PWD = "???", "erdp")                  #Open connection to wrep
+
+db_flow_keys <- as.character(Flow_keys$DBkey)                                     #List flow stations to be downloaded
+
+flow_query <- glue_sql("SELECT V_KEYWORD_TAB_DAILY.*
+FROM V_KEYWORD_TAB_DAILY
+WHERE V_KEYWORD_TAB_DAILY.DBKEY IN ({db_flow_keys*})
+AND V_KEYWORD_TAB_DAILY.DAILY_DATE <= CURRENT_DATE
+AND V_KEYWORD_TAB_DAILY.DAILY_DATE >= TO_DATE ('11/01/2024', 'MM/DD/YYYY')
+AND V_KEYWORD_TAB_DAILY.STATISTIC_TYPE IN ('SUM', 'MEAN')",.con=con)             
+
+flow_data <- DBI::dbGetQuery(con,flow_query)                                            #Query DB for flow
+
+db_stage_keys <- as.character(Stage_keys$DBkey)                                         #List stage stations to be downloaded
+
+stage_query <- glue_sql("SELECT V_KEYWORD_TAB_DAILY.*
+FROM V_KEYWORD_TAB_DAILY
+WHERE V_KEYWORD_TAB_DAILY.DBKEY IN ({db_stage_keys*})
+AND V_KEYWORD_TAB_DAILY.DAILY_DATE <= CURRENT_DATE
+AND V_KEYWORD_TAB_DAILY.DAILY_DATE >= TO_DATE ('11/01/2024', 'MM/DD/YYYY')
+AND V_KEYWORD_TAB_DAILY.STATISTIC_TYPE IN ('SUM', 'MEAN')",.con=con) 
+
+Stage_data <- DBI::dbGetQuery(con,stage_query)                                          #Query DB for flow
+
+dbDisconnect(con)                                                                       #close connection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Import Data -------------------------------------------------------------
 
 #work links
-LIMSP_Provisional_Data <- read_excel("//ad.sfwmd.gov/dfsroot/data/RSSI/MISC/Fire project/Data/Water Quality Data/LIMSP Provisional Data.xlsx")
+LIMSP_Provisional_Data <- read_excel("./Data/LIMSP Provisional Data.xlsx")
 
-find("read_excel")
-find("write.csv")
 # Tidy Data ---------------------------------------------------------------
 
 LIMSP_Provisional_Data_Tidy1 <- LIMSP_Provisional_Data %>%

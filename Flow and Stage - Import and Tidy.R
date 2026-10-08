@@ -73,11 +73,11 @@ dbDisconnect(con)                                                               
 
 flow_and_stage_data <- flow_data  %>%
   select(DAILY_DATE,SITE,VALUE)  %>% rename("Flow (cfs)"=VALUE) %>%
-  left_join(Stage_data %>% select(DAILY_DATE,SITE,VALUE )  %>% rename("Stage (NAVD88 ft)"=VALUE),by=c("DAILY_DATE","SITE"))  %>%
+  left_join(Stage_data %>% select(DAILY_DATE,STATION,SITE,VALUE )  %>% rename("Stage (NAVD88 ft)"=VALUE),by=c("DAILY_DATE","SITE"))  %>%
   left_join(select(Flow_keys,SITE,Flow.way.Location),by="SITE" ) 
 
 
 # Save Date ---------------------------------------------------------------
 
-write.csv(flow_and_stage_data,file="./Data/Flow and Stage.csv")
+write.csv(flow_and_stage_data,file="./Data/Flow and Stage.csv",row.names = F)
 
